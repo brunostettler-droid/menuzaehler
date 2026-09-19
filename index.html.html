@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Menü-Zähler – Thai Food Kurier v6</title>
+<style>
+:root{--gap:10px;--radius:16px}*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f4f6;color:#151515}
+header{position:sticky;top:0;z-index:5;background:#111;color:white;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:22px;margin:0}.date{font-weight:700}.wrap{padding:12px}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:var(--gap);overflow-x:auto}
+.card{background:white;border-radius:var(--radius);padding:12px;box-shadow:0 2px 10px #0001;min-width:130px;text-align:center}
+.card h2{font-size:19px;margin:0 0 4px}.price{font-size:15px;color:#666}.count{font-size:44px;font-weight:900;margin:8px 0}.revenue{font-size:16px;font-weight:700;margin-bottom:9px}
+.pay{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+button{border:0;border-radius:12px;padding:14px 6px;font-size:19px;font-weight:800;touch-action:manipulation;cursor:pointer}
+.b{background:#dff3df}.t{background:#dff0ff}.kk{background:#eee4ff}
+.mini{display:block;font-size:12px;font-weight:600;margin-top:4px}
+.summary{margin-top:12px;background:white;border-radius:var(--radius);padding:14px;box-shadow:0 2px 10px #0001}
+.summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.stat{background:#f5f5f5;border-radius:12px;padding:10px;text-align:center}.stat strong{display:block;font-size:25px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.actions button{font-size:15px;padding:11px 14px;background:#e5e7eb}
+.actions .danger{background:#ffdede}.actions .primary{background:#111;color:#fff}
+.journal{margin-top:12px;background:white;border-radius:var(--radius);padding:14px;overflow:auto}
+.journal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+select{font-size:16px;padding:8px;border-radius:9px}
+table{border-collapse:collapse;width:100%;min-width:1000px;margin-top:10px}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}tfoot{font-weight:900}
+.note{font-size:13px;color:#666;margin-top:8px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(7,145px)}.summary-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>Thai Food Kurier · Menü-Zähler</h1><div class="date" id="date"></div></header>
+<div class="wrap">
+  <div class="grid" id="menuGrid">
+<div class="card" id="card-m1"><h2>Menü 1</h2><div class="price">Fr. 15.–</div><div class="count">0</div><div class="pay"><button class="b">B</button><button class="t">T</button><button class="kk">KK</button></div></div><div class="card" id="card-m2"><h2>Menü 2</h2><div class="price">Fr. 15.–</div><div class="count">0</div><div class="pay"><button class="b">B</button><button class="t">T</button><button class="kk">KK</button></div></div>
+<div class="card" id="card-m3"><h2>Menü 3</h2><div class="price">Fr. 15.–</div><div class="count">0</div><div class="pay"><button class="b">B</button><button class="t">T</button><button class="kk">KK</button></div></div><div class="card" id="card-m4"><h2>Menü 4</h2><div class="price">Fr. 15.–</div><div class="count">0</div><div class="pay"><button class="b">B</button><button class="t">T</button><button class="kk">KK</button></div></div>
+<div class="card" id="card-spiess"><h2>Spiesschen</h2><div class="price">Fr. 15.–</div><div class="count">0</div><div class="pay"><button class="b">B</button><button class="t">T</button><button class="kk">KK</button></div></div><div class="card" id="card-chnus"><h2>Chnusperli</h2><div class="price">Fr. 12.–</div><div class="count">0</div><div class="pay"><button class="b">B</button><button class="t">T</button><button class="kk">KK</button></div></div>
+<div class="card" id="card-div"><h2>Diverses</h2><div class="price">Fr. 10.–</div><div class="count">0</div><div class="pay"><button class="b">B</button><button class="t">T</button><button class="kk">KK</button></div></div>
+</div>
+  <section class="summary">
+    <div class="summary-grid">
+      <div class="stat">Artikel<strong id="allCount">0</strong></div>
+      <div class="stat">Tagesumsatz<strong id="allRevenue">Fr. 0.–</strong></div>
+      <div class="stat">Bar<strong id="barTotal">0 · Fr. 0.–</strong></div>
+      <div class="stat">TWINT<strong id="twintTotal">0 · Fr. 0.–</strong></div>
+      <div class="stat">Kreditkarte<strong id="cardTotal">0 · Fr. 0.–</strong></div>
+    </div>
+    <div class="actions">
+      <button class="danger" onclick="undoLast()">↩ Letzte Buchung rückgängig</button>
+      <button onclick="closeDay()">Tagesabschluss</button>
+      <button class="primary" onclick="exportCSV()">Monat als CSV exportieren</button>
+<button onclick="exportBackup()">💾 Backup speichern</button>
+<button onclick="document.getElementById('backupFile').click()">📂 Backup wiederherstellen</button>
+<input id="backupFile" type="file" accept=".json,application/json" style="display:none" onchange="importBackup(event)">
+    </div>
+    <div class="note">Alle Buchungen werden lokal auf diesem Gerät gespeichert. B/T/KK buchen jeweils 1 Artikel inklusive Zahlungsart. <b id="saveState">bereit</b></div>
+  </section>
+  <section class="journal">
+    <div class="journal-head"><h2 style="margin:0">Monatsjournal</h2><select id="monthSelect" onchange="renderJournal()"></select></div>
+    <div id="journalTable"></div>
+  </section>
+</div>
+<script>
+const MENUS=[
+ {id:"m1",name:"Menü 1",price:15},{id:"m2",name:"Menü 2",price:15},
+ {id:"m3",name:"Menü 3",price:15},{id:"m4",name:"Menü 4",price:15},
+ {id:"spiess",name:"Spiesschen",price:15},{id:"chnus",name:"Chnusperli",price:12},
+ {id:"div",name:"Diverses",price:10}
+];
+const PAY={B:"Bar",T:"TWINT",KK:"Kreditkarte"};
+const KEY="tfk_menuzaehler_v3";
+let db=load();
+function localDate(d=new Date()){let y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`}
+function emptyDay(){let menus={};MENUS.forEach(m=>menus[m.id]={B:0,T:0,KK:0});return {menus,transactions:[],closed:false}}
+function load(){
+ try{
+   let raw=localStorage.getItem(KEY);
+   if(raw)return JSON.parse(raw);
+ }catch(e){}
+ return {days:{}};
+}
+function save(){
+ try{
+   localStorage.setItem(KEY,JSON.stringify(db));
+   localStorage.setItem(KEY+"_lastsave",new Date().toISOString());
+   showSaveState("✓ gespeichert");
+   return true;
+ }catch(e){
+   showSaveState("⚠ Speicherung blockiert – bitte Backup nutzen");
+   return false;
+ }
+}
+function showSaveState(txt){
+ let el=document.getElementById("saveState");
+ if(el)el.textContent=txt;
+}
+function ensureToday(){let k=localDate();if(!db.days[k]){db.days[k]=emptyDay();save()}return db.days[k]}
+function money(n){return "Fr. "+Number(n).toLocaleString("de-CH",{minimumFractionDigits:0,maximumFractionDigits:2})+".–"}
+function menuStats(day,m){let x=day.menus[m.id]||{B:0,T:0,KK:0},count=x.B+x.T+x.KK;return {x,count,revenue:count*m.price}}
+function dayStats(day){let pc={B:0,T:0,KK:0},pr={B:0,T:0,KK:0},count=0,revenue=0;
+ MENUS.forEach(m=>{let s=menuStats(day,m);count+=s.count;revenue+=s.revenue;for(let p in pc){pc[p]+=s.x[p];pr[p]+=s.x[p]*m.price}});
+ return {pc,pr,count,revenue}
+}
+function book(id,pay){
+ let day=ensureToday(); if(day.closed && !confirm("Dieser Tag wurde abgeschlossen. Trotzdem buchen?"))return;
+ let m=MENUS.find(x=>x.id===id);day.menus[id][pay]++;day.transactions.push({id,pay,price:m.price,time:new Date().toISOString()});save();render();
+}
+function undoLast(){
+ let day=ensureToday(),t=day.transactions.pop();if(!t){alert("Keine Buchung zum Rückgängigmachen.");return}
+ if(day.menus[t.id] && day.menus[t.id][t.pay]>0)day.menus[t.id][t.pay]--;save();render();
+}
+function closeDay(){let d=ensureToday();if(confirm("Heutigen Tag abschliessen? Die Daten bleiben im Journal.")){d.closed=true;save();render()}}
+function render(){
+ let day=ensureToday();document.getElementById("date").textContent=new Date().toLocaleDateString("de-CH",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})+(day.closed?" · abgeschlossen":"");
+ MENUS.forEach(m=>{let st=menuStats(day,m);let c=document.getElementById("card-"+m.id);
+ if(c)c.innerHTML=`<h2>${m.name}</h2><div class="price">${money(m.price)}</div><div class="count">${st.count}</div><div class="revenue">${money(st.revenue)}</div>
+ <div class="pay">${["B","T","KK"].map(p=>`<button class="${p==="B"?"b":p==="T"?"t":"kk"}" onclick="book('${m.id}','${p}')">${p}<span class="mini">${st.x[p]}×</span></button>`).join("")}</div>`;});
+ let s=dayStats(day);
+ document.getElementById("allCount").textContent=s.count;
+ document.getElementById("allRevenue").textContent=money(s.revenue);
+ document.getElementById("barTotal").textContent=`${s.pc.B} · ${money(s.pr.B)}`;
+ document.getElementById("twintTotal").textContent=`${s.pc.T} · ${money(s.pr.T)}`;
+ document.getElementById("cardTotal").textContent=`${s.pc.KK} · ${money(s.pr.KK)}`;
+ updateMonths();renderJournal();
+}
+function updateMonths(){
+ let sel=document.getElementById("monthSelect"),current=sel.value||localDate().slice(0,7);let months=[...new Set([...Object.keys(db.days).map(d=>d.slice(0,7)),localDate().slice(0,7)])].sort().reverse();
+ sel.innerHTML=months.map(m=>`<option value="${m}" ${m===current?"selected":""}>${m.split("-").reverse().join(".")}</option>`).join("");
+}
+function renderJournal(){
+ let month=document.getElementById("monthSelect").value||localDate().slice(0,7),days=Object.keys(db.days).filter(d=>d.startsWith(month)).sort(),tot={count:0,rev:0,B:0,T:0,KK:0,Br:0,Tr:0,KKr:0},menuTot={};MENUS.forEach(m=>menuTot[m.id]=0);
+ let rows=days.map(k=>{let d=db.days[k],s=dayStats(d);tot.count+=s.count;tot.rev+=s.revenue;["B","T","KK"].forEach(p=>{tot[p]+=s.pc[p]});tot.Br+=s.pr.B;tot.Tr+=s.pr.T;tot.KKr+=s.pr.KK;
+ let ms=MENUS.map(m=>{let z=menuStats(d,m);menuTot[m.id]+=z.count;return `<td>${z.count}</td>`}).join("");
+ return `<tr><td>${k.split("-").reverse().join(".")}</td>${ms}<td>${s.pc.B} / ${money(s.pr.B)}</td><td>${s.pc.T} / ${money(s.pr.T)}</td><td>${s.pc.KK} / ${money(s.pr.KK)}</td><td><b>${s.count}</b></td><td><b>${money(s.revenue)}</b></td></tr>`}).join("");
+ let heads=MENUS.map(m=>`<th>${m.name}</th>`).join(""),foots=MENUS.map(m=>`<td>${menuTot[m.id]}</td>`).join("");
+ document.getElementById("journalTable").innerHTML=`<table><thead><tr><th>Datum</th>${heads}<th>Bar</th><th>TWINT</th><th>KK</th><th>Stück</th><th>Umsatz</th></tr></thead><tbody>${rows||'<tr><td colspan="13">Noch keine Buchungen.</td></tr>'}</tbody><tfoot><tr><td>Monat total</td>${foots}<td>${tot.B} / ${money(tot.Br)}</td><td>${tot.T} / ${money(tot.Tr)}</td><td>${tot.KK} / ${money(tot.KKr)}</td><td>${tot.count}</td><td>${money(tot.rev)}</td></tr></tfoot></table>`;
+}
+function exportBackup(){
+ try{
+   save();
+   let payload={app:"Thai Food Kurier Menü-Zähler",version:6,exportedAt:new Date().toISOString(),data:db};
+   let blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+   let a=document.createElement("a");
+   a.href=URL.createObjectURL(blob);
+   a.download=`Menuezaehler-Backup-${localDate()}.json`;
+   document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+ }catch(e){alert("Backup konnte nicht erstellt werden.");}
+}
+function importBackup(ev){
+ let file=ev.target.files&&ev.target.files[0]; if(!file)return;
+ let reader=new FileReader();
+ reader.onload=function(){
+   try{
+     let obj=JSON.parse(reader.result);
+     let incoming=obj.data||obj;
+     if(!incoming || typeof incoming!=="object" || !incoming.days)throw new Error();
+     if(!confirm("Backup wirklich wiederherstellen? Der aktuelle Datenstand wird ersetzt."))return;
+     db=incoming;save();ensureToday();render();showSaveState('✓ bereit – Änderungen werden sofort gespeichert');alert("Backup wurde wiederhergestellt.");
+   }catch(e){alert("Diese Datei ist kein gültiges Menü-Zähler-Backup.");}
+   ev.target.value="";
+ };
+ reader.readAsText(file);
+}
+function exportCSV(){
+ let month=document.getElementById("monthSelect").value||localDate().slice(0,7),days=Object.keys(db.days).filter(d=>d.startsWith(month)).sort();
+ let header=["Datum",...MENUS.map(m=>m.name),"Bar Stück","Bar CHF","TWINT Stück","TWINT CHF","KK Stück","KK CHF","Total Stück","Total CHF"];
+ let lines=[header.join(";")];
+ days.forEach(k=>{let d=db.days[k],s=dayStats(d),vals=[k,...MENUS.map(m=>menuStats(d,m).count),s.pc.B,s.pr.B.toFixed(2),s.pc.T,s.pr.T.toFixed(2),s.pc.KK,s.pr.KK.toFixed(2),s.count,s.revenue.toFixed(2)];lines.push(vals.join(";"))});
+ let blob=new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`Menue-Journal-${month}.csv`;a.click();URL.revokeObjectURL(a.href);
+}
+ensureToday();render();
+</script>
+</body></html>
