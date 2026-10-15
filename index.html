@@ -753,9 +753,43 @@ function dayStats(day){let pc={B:0,T:0,KK:0},pr={B:0,T:0,KK:0},count=0,revenue=0
  return {pc,pr,count,revenue}
 }
 function bookLoyaltyMeal(id){book(id,loyaltyPrice===95?"H":"L");}
+let bookingAudioContext;
+function bookingFeedback(id){
+ const total=document.querySelector('#card-'+id+' .count, #card-'+id+' .loyalty-total');
+ if(total){
+  total.classList.remove('booking-flash');
+  void total.offsetWidth;
+  total.classList.add('booking-flash');
+  setTimeout(()=>total.classList.remove('booking-flash'),2600);
+  total.addEventListener('animationend',()=>total.classList.remove('booking-flash'),{once:true});
+ }
+ try{
+  const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+  if(!AudioContextClass)return;
+  bookingAudioContext=bookingAudioContext||new AudioContextClass();
+  const ctx=bookingAudioContext;
+  const play=()=>{
+   const now=ctx.currentTime;
+   // Helles Glöckchen mit sanft ausklingenden Obertönen.
+   const master=ctx.createGain();master.gain.value=.45;master.connect(ctx.destination);
+   [[1567.98,.28,1.5],[3135.96,.10,1.0],[4233.55,.045,.7],[6115.12,.018,.45]].forEach(([frequency,volume,duration])=>{
+    const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+    oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency*1.002,now);
+    oscillator.frequency.exponentialRampToValueAtTime(frequency,now+.25);
+    gain.gain.setValueAtTime(0,now);
+    gain.gain.linearRampToValueAtTime(volume,now+.012);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+    oscillator.connect(gain);gain.connect(master);
+    oscillator.start(now);oscillator.stop(now+duration+.02);
+   });
+   setTimeout(()=>master.disconnect(),1700);
+  };
+  if(ctx.state==='suspended')ctx.resume().then(play).catch(()=>{});else play();
+ }catch(e){/* Visuelle Rückmeldung bleibt auch ohne Audio verfügbar. */}
+}
 function book(id,pay){
  let day=ensureToday(); if(day.closed && !confirm("Dieser Tag wurde abgeschlossen. Trotzdem buchen?"))return;
- let m=MENUS.find(x=>x.id===id);day.menus[id][pay]=(day.menus[id][pay]||0)+1;day.transactions.push({id,pay,price:(pay==="L"||pay==="H")?0:id==="loyalty"?loyaltyPrice:sellingPrice(m),halfMenu:halfMenuMode&&isMainMenu(id)&&['B','T','KK'].includes(pay),time:new Date().toISOString()});if(isMainMenu(id)&&["B","T","KK"].includes(pay))halfMenuMode=false;save();render();
+ let m=MENUS.find(x=>x.id===id);day.menus[id][pay]=(day.menus[id][pay]||0)+1;day.transactions.push({id,pay,price:(pay==="L"||pay==="H")?0:id==="loyalty"?loyaltyPrice:sellingPrice(m),halfMenu:halfMenuMode&&isMainMenu(id)&&['B','T','KK'].includes(pay),time:new Date().toISOString()});if(isMainMenu(id)&&["B","T","KK"].includes(pay))halfMenuMode=false;save();render();bookingFeedback(id);
 }
 function undoLast(){
  let day=ensureToday(),t=day.transactions.pop();if(!t){alert("Keine Buchung zum Rückgängigmachen.");return}
@@ -926,6 +960,21 @@ ensureToday();render();
 .actions button{background:rgba(229,231,235,var(--button-alpha))}
 .actions .danger{background:rgba(255,222,222,var(--button-alpha))}
 .actions .primary{background:rgba(17,17,17,var(--button-alpha))}
+
+/* Grössere Stücktotale, Umsatz unverändert. */
+#salesPage .card:not(#card-drinks) .count{font-size:46px!important;line-height:1.05!important}
+@media screen and (min-width:900px) and (max-height:950px){
+ #salesPage .card:not(#card-drinks) .count{font-size:34px!important}
+}
+@keyframes booking-total-flash{
+ 0%,45%{color:#ffe17a;text-shadow:0 0 15px #ffd34f;transform:scale(1.16)}
+ 24%,70%{color:#fff;text-shadow:none;transform:scale(1)}
+ 100%{transform:scale(1)}
+}
+#salesPage .booking-flash{animation:booking-total-flash 2.5s ease-out}
+@media(prefers-reduced-motion:reduce){
+ #salesPage .booking-flash{animation:none;color:#ffe17a;background:#785200;border-radius:6px}
+}
 </style>
 
 
