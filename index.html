@@ -832,7 +832,7 @@ function removeBooking(dayKey,transaction){
 }
 function showUndoChoices(){
  const dayKey=localDate(),day=ensureToday();
- const entries=(day.transactions||[]).slice(-5).reverse();
+ const entries=(day.transactions||[]).slice(-10).reverse();
  if(!entries.length)return;
  const dialog=document.getElementById('undoChoices');
  const list=document.getElementById('undoChoicesList');list.replaceChildren();
@@ -846,7 +846,7 @@ function showUndoChoices(){
  dialog.showModal();
 }
 function renderUndo(day){
- const count=Math.min(5,(day.transactions||[]).length);
+ const count=Math.min(10,(day.transactions||[]).length);
  for(const id of ['undoSales','undoJournal']){
   const button=document.getElementById(id);if(!button)continue;
   button.textContent=count?'↩ Rückgängig · Buchung wählen':'↩ Rückgängig · Keine Buchung';
@@ -980,7 +980,7 @@ ensureToday();render();
 
 
 <dialog id="undoChoices" aria-labelledby="undoChoicesTitle">
-<h2 id="undoChoicesTitle">Letzte 5 Buchungen</h2>
+<h2 id="undoChoicesTitle">Letzte 10 Buchungen</h2>
 <p>Tippe die Buchung an, die du löschen möchtest.</p>
 <div id="undoChoicesList"></div>
 <button type="button" class="undo-cancel" onclick="document.getElementById('undoChoices').close()">Abbrechen</button>
