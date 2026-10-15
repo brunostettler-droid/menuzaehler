@@ -760,7 +760,7 @@ function bookingFeedback(id){
   total.classList.remove('booking-flash');
   void total.offsetWidth;
   total.classList.add('booking-flash');
-  setTimeout(()=>total.classList.remove('booking-flash'),2600);
+  setTimeout(()=>total.classList.remove('booking-flash'),4100);
   total.addEventListener('animationend',()=>total.classList.remove('booking-flash'),{once:true});
  }
  try{
@@ -971,7 +971,7 @@ ensureToday();render();
  24%,70%{color:#fff;text-shadow:none;transform:scale(1)}
  100%{transform:scale(1)}
 }
-#salesPage .booking-flash{animation:booking-total-flash 2.5s ease-out}
+#salesPage .booking-flash{animation:booking-total-flash 4s ease-out}
 @media(prefers-reduced-motion:reduce){
  #salesPage .booking-flash{animation:none;color:#ffe17a;background:#785200;border-radius:6px}
 }
