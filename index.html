@@ -835,17 +835,17 @@ function removeBooking(dayKey,transaction){
 function showUndoChoices(){
  const dayKey=localDate(),day=ensureToday();
  const entries=(day.transactions||[]).slice(-10).reverse();
- if(!entries.length)return;
  const dialog=document.getElementById('undoChoices');
  const list=document.getElementById('undoChoicesList');list.replaceChildren();
+ if(!entries.length){const message=document.createElement('p');message.textContent='Keine Buchungen mehr vorhanden.';list.appendChild(message);}
  entries.forEach((transaction,index)=>{
   const button=document.createElement('button');button.type='button';
   const time=transaction.time?new Date(transaction.time).toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
   button.textContent=`${index===0?'Zuletzt · ':''}${time} — ${transactionLabel(transaction)}`;
-  button.onclick=()=>{dialog.close();removeBooking(dayKey,transaction)};
+  button.onclick=()=>{if(removeBooking(dayKey,transaction))showUndoChoices()};
   list.appendChild(button);
  });
- dialog.showModal();
+ if(!dialog.open)dialog.showModal();
 }
 function renderUndo(day){
  const count=Math.min(10,(day.transactions||[]).length);
@@ -985,7 +985,7 @@ ensureToday();render();
 <h2 id="undoChoicesTitle">Letzte 10 Buchungen</h2>
 <p>Tippe die Buchung an, die du löschen möchtest.</p>
 <div id="undoChoicesList"></div>
-<button type="button" class="undo-cancel" onclick="document.getElementById('undoChoices').close()">Abbrechen</button>
+<button type="button" class="undo-cancel" onclick="document.getElementById('undoChoices').close()">Schliessen</button>
 </dialog>
 <section id="dailyPrintReport" aria-hidden="true"></section>
 </body></html>
