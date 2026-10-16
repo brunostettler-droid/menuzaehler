@@ -771,19 +771,38 @@ function bookingFeedback(id,mode="both"){
   const ctx=bookingAudioContext;
   const play=()=>{
    const now=ctx.currentTime;
-   // Helles Glöckchen mit sanft ausklingenden Obertönen.
-   const master=ctx.createGain();master.gain.value=2.0;master.connect(ctx.destination);
-   [[1567.98,.28,1.5],[3135.96,.10,1.0],[4233.55,.045,.7],[6115.12,.018,.45]].forEach(([frequency,volume,duration])=>{
-    const oscillator=ctx.createOscillator(),gain=ctx.createGain();
-    oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency*1.002,now);
-    oscillator.frequency.exponentialRampToValueAtTime(frequency,now+.25);
-    gain.gain.setValueAtTime(0,now);
-    gain.gain.linearRampToValueAtTime(volume,now+.012);
-    gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
-    oscillator.connect(gain);gain.connect(master);
-    oscillator.start(now);oscillator.stop(now+duration+.02);
+   // Kurzer synthetischer Jodel mit Brust-/Kopfstimmenwechsel und Vokalformanten.
+   const master=ctx.createGain();master.gain.value=.8;master.connect(ctx.destination);
+   const syllables=[
+    [0,.25,293.66,[500,900,2400]],
+    [.25,.23,587.33,[430,850,2400]],
+    [.48,.22,369.99,[600,1000,2400]],
+    [.70,.25,739.99,[300,2200,3000]],
+    [.95,.24,587.33,[300,2200,3000]],
+    [1.19,.36,293.66,[500,900,2400]]
+   ];
+   syllables.forEach(([offset,duration,frequency,formants])=>{
+    const start=now+offset,source=ctx.createOscillator(),envelope=ctx.createGain();
+    source.type='sawtooth';source.frequency.setValueAtTime(frequency*.94,start);
+    source.frequency.exponentialRampToValueAtTime(frequency,start+.035);
+    envelope.gain.setValueAtTime(0,start);
+    envelope.gain.linearRampToValueAtTime(.75,start+.018);
+    envelope.gain.setValueAtTime(.6,start+duration-.045);
+    envelope.gain.linearRampToValueAtTime(0,start+duration);
+    envelope.connect(master);
+    formants.forEach((formant,index)=>{
+     const filter=ctx.createBiquadFilter(),level=ctx.createGain();
+     filter.type='bandpass';filter.frequency.value=formant;filter.Q.value=5;
+     level.gain.value=[.9,.45,.2][index];
+     source.connect(filter);filter.connect(level);level.connect(envelope);
+    });
+    const vibrato=ctx.createOscillator(),depth=ctx.createGain();
+    vibrato.frequency.value=5.5;depth.gain.value=frequency*.012;
+    vibrato.connect(depth);depth.connect(source.frequency);
+    source.start(start);source.stop(start+duration+.01);
+    vibrato.start(start);vibrato.stop(start+duration+.01);
    });
-   setTimeout(()=>master.disconnect(),1700);
+   setTimeout(()=>master.disconnect(),1800);
   };
   if(ctx.state==='suspended')ctx.resume().then(play).catch(()=>{});else play();
  }catch(e){/* Visuelle Rückmeldung bleibt auch ohne Audio verfügbar. */}
