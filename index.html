@@ -771,7 +771,7 @@ function bookingFeedback(id){
   const play=()=>{
    const now=ctx.currentTime;
    // Helles Glöckchen mit sanft ausklingenden Obertönen.
-   const master=ctx.createGain();master.gain.value=.45;master.connect(ctx.destination);
+   const master=ctx.createGain();master.gain.value=.675;master.connect(ctx.destination);
    [[1567.98,.28,1.5],[3135.96,.10,1.0],[4233.55,.045,.7],[6115.12,.018,.45]].forEach(([frequency,volume,duration])=>{
     const oscillator=ctx.createOscillator(),gain=ctx.createGain();
     oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency*1.002,now);
