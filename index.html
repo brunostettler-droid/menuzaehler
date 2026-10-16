@@ -1101,5 +1101,20 @@ wake();
 <div id="undoChoicesList"></div>
 <button type="button" class="undo-cancel" onclick="document.getElementById('undoChoices').close()">Schliessen</button>
 </dialog>
+<script>
+// Nur ein vollständiger Tipp ausserhalb der Dialogkarte schliesst die Ansicht.
+(()=>{
+ const dialog=document.getElementById('undoChoices');
+ let startedOutside=false;
+ const outside=event=>{const r=dialog.getBoundingClientRect();return event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom};
+ dialog.addEventListener('pointerdown',event=>{startedOutside=event.target===dialog&&outside(event)});
+ dialog.addEventListener('pointercancel',()=>{startedOutside=false});
+ dialog.addEventListener('click',event=>{
+  if(startedOutside&&event.target===dialog&&outside(event))dialog.close();
+  startedOutside=false;
+ });
+ dialog.addEventListener('close',()=>{startedOutside=false});
+})();
+</script>
 <section id="dailyPrintReport" aria-hidden="true"></section>
 </body></html>
