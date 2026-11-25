@@ -501,7 +501,7 @@ header h1{font-size:22px!important}
 #salesPage .lower-row{transform:translateY(-24px)}
 
 
-/* V68: longer gold lily dividers with nine flowers per column. */
+/* Gold lily divider dimensions. */
 #salesPage .lily-divider{top:calc(58% - 134px);height:300px}
 
 /* V69: fit the sales controls into a laptop viewport. */
@@ -675,7 +675,7 @@ function renderLilies(){
   const divider=document.createElement("span");
   divider.className="lily-divider";
   divider.setAttribute("aria-hidden","true");
-  for(let i=0;i<9;i++){
+  for(let i=0;i<5;i++){
    const img=document.createElement("img");
    img.src=LILY_IMAGE;img.alt="";img.width=22;img.height=22;
    divider.appendChild(img);
@@ -1060,11 +1060,11 @@ ensureToday();render();
 }
 </style>
 <style id="compact-sales-height">
-/* Keep all loyalty meals visible within the available screen height. */
+/* Spread the three sales rows across the available height and allow scrolling on short screens. */
 @media screen {
  :root{--footer-height:60px}
  #salesPage{padding:6px 16px 10px!important}
- #salesPage .grid{height:100%!important;min-height:min-content;grid-template-rows:minmax(min-content,.85fr) 76px minmax(min-content,1.15fr)!important;row-gap:8px!important}
+ #salesPage .grid{height:auto!important;min-height:100%;grid-template-rows:repeat(3,max-content)!important;align-content:space-between;row-gap:clamp(8px,1.4dvh,18px)!important}
  #salesPage .card{padding-top:3px!important;padding-bottom:3px!important;min-height:0}
  #salesPage .card h2{font-size:clamp(22px,3.2vh,30px)!important;margin:0 0 2px!important}
  #salesPage .price{font-size:14px!important;margin:0!important}
@@ -1091,7 +1091,8 @@ ensureToday();render();
  #salesPage #halfMenuToggle{top:0;min-height:36px!important;padding:5px 4px}
  .footerbar{padding-top:4px;padding-bottom:calc(4px + env(safe-area-inset-bottom,0px))}
  .footerbar button{min-height:40px;font-size:17px;padding:8px 14px}
- #salesPage .lily-divider{top:8%;height:84%}
+ #salesPage .lily-divider{top:6%;height:min(64%,150px)}
+ #salesPage .lily-divider img{flex-shrink:1;min-height:0}
 }
 </style>
 </body></html>
