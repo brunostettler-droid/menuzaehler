@@ -1064,28 +1064,28 @@ ensureToday();render();
 @media screen {
  :root{--footer-height:60px}
  #salesPage{padding:6px 16px 10px!important}
- #salesPage .grid{height:auto!important;min-height:100%;grid-template-rows:repeat(3,max-content)!important;align-content:space-between;row-gap:clamp(8px,1.4dvh,18px)!important}
+ #salesPage .grid{height:auto!important;min-height:100%;grid-template-rows:repeat(3,max-content)!important;align-content:space-between;row-gap:8px!important}
  #salesPage .card{padding-top:3px!important;padding-bottom:3px!important;min-height:0}
  #salesPage .card h2{font-size:clamp(22px,3.2vh,30px)!important;margin:0 0 2px!important}
  #salesPage .price{font-size:14px!important;margin:0!important}
  #salesPage .card:not(#card-drinks) .count{font-size:clamp(28px,4vh,46px)!important;line-height:1.05;margin:2px 0!important}
  #salesPage .revenue{font-size:14px!important;margin:0 0 5px!important}
- #salesPage .pay{--button-height:clamp(48px,7dvh,74px);grid-template-rows:repeat(3,calc(var(--button-height) / 2))!important}
+ #salesPage .pay{--button-height:clamp(52px,11dvh,125px);grid-template-rows:repeat(3,calc(var(--button-height) / 2))!important}
  #salesPage .pay button{height:var(--button-height)!important;min-height:var(--button-height)!important;padding:4px 2px!important;font-size:24px!important}
  #salesPage .pay .mini{font-size:12px!important;margin-top:2px!important}
  #salesPage .lower-row{transform:none;min-height:0;align-self:stretch}
  #salesPage #card-drinks{margin:0;padding:0 8px!important}
- #salesPage #card-drinks .pay{--button-height:52px;grid-template-rows:repeat(3,26px)!important;transform:none}
- #salesPage #card-drinks .pay button{height:52px!important;min-height:52px!important;font-size:22px!important}
+ #salesPage #card-drinks .pay{--button-height:clamp(52px,10dvh,110px);grid-template-rows:repeat(3,calc(var(--button-height) / 2))!important;transform:none}
+ #salesPage #card-drinks .pay button{height:var(--button-height)!important;min-height:var(--button-height)!important;font-size:22px!important}
  #salesPage #card-loyalty{padding:3px 0!important}
  #salesPage #card-loyalty .loyalty-head{gap:6px}
  #salesPage #card-loyalty .loyalty-head h2{font-size:18px!important;line-height:36px!important}
  #salesPage .loyalty-controls{gap:5px}
- #salesPage .loyalty-price{min-height:36px!important;padding:5px 2px!important;font-size:18px}
+ #salesPage .loyalty-price{min-height:clamp(36px,6dvh,64px)!important;padding:5px 2px!important;font-size:18px}
  #salesPage #card-loyalty .loyalty-controls .pay{grid-template-rows:auto!important}
- #salesPage #card-loyalty .loyalty-controls .pay button{height:42px!important;min-height:42px!important;font-size:18px!important}
+ #salesPage #card-loyalty .loyalty-controls .pay button{height:clamp(42px,7dvh,76px)!important;min-height:clamp(42px,7dvh,76px)!important;font-size:18px!important}
  #salesPage .loyalty-menus{gap:5px;margin-top:6px}
- #salesPage .loyalty-menus button{min-height:36px!important;padding:3px 3px;font-size:15px;line-height:1.1}
+ #salesPage .loyalty-menus button{min-height:clamp(36px,5.5dvh,60px)!important;padding:3px 3px;font-size:15px;line-height:1.1}
  #salesPage #card-loyalty .mini{margin-top:2px!important}
  #salesPage .loyalty-total{font-size:12px;line-height:1.2;margin-top:4px}
  #salesPage #halfMenuToggle{top:0;min-height:36px!important;padding:5px 4px}
